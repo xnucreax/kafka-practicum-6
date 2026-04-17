@@ -13,6 +13,7 @@ type SingleMessageConsumerParams struct {
 	BootstrapServers string
 	GroupID          string
 	Topic            string
+	SSL              SSLConfig
 }
 
 func RunSingleMessageConsumer(ctx context.Context, p SingleMessageConsumerParams) error {
@@ -21,6 +22,8 @@ func RunSingleMessageConsumer(ctx context.Context, p SingleMessageConsumerParams
 		"group.id":           p.GroupID,
 		"auto.offset.reset":  "earliest",
 		"enable.auto.commit": true,
+		"security.protocol":  "ssl",
+		"ssl.ca.location":    p.SSL.CALocation,
 	})
 	if err != nil {
 		return err

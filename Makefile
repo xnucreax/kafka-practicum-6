@@ -1,5 +1,5 @@
 .PHONY: up
-run: build compose-up
+up: build compose-up
 
 .PHONY: build
 build:

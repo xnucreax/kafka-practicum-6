@@ -14,6 +14,7 @@ type BatchMessageConsumerParams struct {
 	BootstrapServers string
 	GroupID          string
 	Topic            string
+	SSL              SSLConfig
 }
 
 func RunBatchMessageConsumer(ctx context.Context, p BatchMessageConsumerParams) error {
@@ -26,6 +27,8 @@ func RunBatchMessageConsumer(ctx context.Context, p BatchMessageConsumerParams) 
 		"auto.offset.reset":  "earliest",
 		"enable.auto.commit": false,
 		"fetch.min.bytes":    minBytes,
+		"security.protocol":  "ssl",
+		"ssl.ca.location":    p.SSL.CALocation,
 	})
 	if err != nil {
 		return err

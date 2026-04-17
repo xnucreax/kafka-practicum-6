@@ -14,8 +14,8 @@ import (
 type ProducerParams struct {
 	BootstrapServers string
 	Topic            string
-
-	Id int
+	Id               int
+	SSL              SSLConfig
 }
 
 func RunProducer(ctx context.Context, p ProducerParams) error {
@@ -23,6 +23,8 @@ func RunProducer(ctx context.Context, p ProducerParams) error {
 		"bootstrap.servers": p.BootstrapServers,
 		"acks":              "all",
 		"retries":           3,
+		"security.protocol": "ssl",
+		"ssl.ca.location":   p.SSL.CALocation,
 	})
 	if err != nil {
 		return err

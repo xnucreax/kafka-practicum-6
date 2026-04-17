@@ -1,3 +1,0 @@
-sslkey_password
-keystore_password
-truststore_password

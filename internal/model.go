@@ -6,3 +6,7 @@ type Message struct {
 	UUID  uuid.UUID
 	Value int
 }
+
+type SSLConfig struct {
+	CALocation string
+}
