@@ -22,13 +22,15 @@ func RunBatchMessageConsumer(ctx context.Context, p BatchMessageConsumerParams) 
 	minBytes := 50 * int(unsafe.Sizeof(Message{}))
 
 	consumer, err := kafka.NewConsumer(&kafka.ConfigMap{
-		"bootstrap.servers":  p.BootstrapServers,
-		"group.id":           p.GroupID,
-		"auto.offset.reset":  "earliest",
-		"enable.auto.commit": false,
-		"fetch.min.bytes":    minBytes,
-		"security.protocol":  "ssl",
-		"ssl.ca.location":    p.SSL.CALocation,
+		"bootstrap.servers":        p.BootstrapServers,
+		"group.id":                 p.GroupID,
+		"auto.offset.reset":        "earliest",
+		"enable.auto.commit":       false,
+		"fetch.min.bytes":          minBytes,
+		"security.protocol":        "ssl",
+		"ssl.ca.location":          p.SSL.CALocation,
+		"ssl.certificate.location": p.SSL.CertLocation,
+		"ssl.key.location":         p.SSL.KeyLocation,
 	})
 	if err != nil {
 		return err

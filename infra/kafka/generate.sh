@@ -1,12 +1,3 @@
-openssl req -new -nodes -x509 \
-    -days 365 \
-    -newkey rsa:2048 \
-    -keyout certs/ca.key \
-    -out certs/ca.crt \
-    -config ca-cert.cnf
-
-cat certs/ca.crt certs/ca.key > certs/ca.pem
-
 openssl req -new \
     -newkey rsa:2048 \
     -keyout certs/kafka.key \
@@ -17,8 +8,8 @@ openssl req -new \
 openssl x509 -req \
     -days 3650 \
     -in certs/kafka.csr \
-    -CA certs/ca.crt \
-    -CAkey certs/ca.key \
+    -CA ../ca/certs/ca.crt \
+    -CAkey ../ca/certs/ca.key \
     -CAcreateserial \
     -out certs/kafka.crt \
     -extfile kafka-cert.cnf \
@@ -28,7 +19,7 @@ openssl pkcs12 -export \
     -in certs/kafka.crt \
     -inkey certs/kafka.key \
     -chain \
-    -CAfile certs/ca.pem \
+    -CAfile ../ca/certs/ca.pem \
     -name kafka \
     -out certs/kafka.p12 \
     -password pass:sslkey_password
@@ -43,7 +34,7 @@ keytool -importkeystore \
     -srcstorepass sslkey_password
 
 keytool -import \
-    -file certs/ca.crt \
+    -file ../ca/certs/ca.crt \
     -alias ca \
     -keystore stores/kafka.truststore.jks \
     -storepass truststore_password \

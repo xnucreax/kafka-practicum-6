@@ -21,11 +21,13 @@ type ProducerParams struct {
 
 func RunProducer(ctx context.Context, p ProducerParams) error {
 	producer, err := kafka.NewProducer(&kafka.ConfigMap{
-		"bootstrap.servers": p.BootstrapServers,
-		"acks":              "all",
-		"retries":           3,
-		"security.protocol": "ssl",
-		"ssl.ca.location":   p.SSL.CALocation,
+		"bootstrap.servers":        p.BootstrapServers,
+		"acks":                     "all",
+		"retries":                  3,
+		"security.protocol":        "ssl",
+		"ssl.ca.location":          p.SSL.CALocation,
+		"ssl.certificate.location": p.SSL.CertLocation,
+		"ssl.key.location":         p.SSL.KeyLocation,
 	})
 	if err != nil {
 		return err
@@ -81,6 +83,8 @@ func RunProducer(ctx context.Context, p ProducerParams) error {
 			for producer.Flush(10000) > 0 {
 				fmt.Print("Still waiting to flush outstanding messages")
 			}
+
+			log.Printf("produced message: id %s, value %d", msg.UUID.String(), msg.Value)
 		}
 	}()
 

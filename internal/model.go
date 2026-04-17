@@ -8,5 +8,7 @@ type Message struct {
 }
 
 type SSLConfig struct {
-	CALocation string
+	CALocation   string
+	CertLocation string
+	KeyLocation  string
 }

@@ -18,18 +18,20 @@ kafka-topics --create --if-not-exists \
   --bootstrap-server "$BOOTSTRAP" \
   --command-config "$CMD_CONFIG"
 
+# topic-1: practicum-1 can produce and consume
 kafka-acls --bootstrap-server "$BOOTSTRAP" --command-config "$CMD_CONFIG" \
-  --add --allow-principal "User:*" \
+  --add --allow-principal "User:practicum-1" \
   --operation Write --topic topic-1
 
 kafka-acls --bootstrap-server "$BOOTSTRAP" --command-config "$CMD_CONFIG" \
-  --add --allow-principal "User:*" \
+  --add --allow-principal "User:practicum-1" \
   --operation Read --topic topic-1
 
 kafka-acls --bootstrap-server "$BOOTSTRAP" --command-config "$CMD_CONFIG" \
-  --add --allow-principal "User:*" \
+  --add --allow-principal "User:practicum-1" \
   --operation Read --group "*"
 
+# topic-2: practicum-2 can only produce, not consume
 kafka-acls --bootstrap-server "$BOOTSTRAP" --command-config "$CMD_CONFIG" \
-  --add --allow-principal "User:*" \
+  --add --allow-principal "User:practicum-2" \
   --operation Write --topic topic-2

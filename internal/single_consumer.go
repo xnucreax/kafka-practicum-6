@@ -18,12 +18,14 @@ type SingleMessageConsumerParams struct {
 
 func RunSingleMessageConsumer(ctx context.Context, p SingleMessageConsumerParams) error {
 	consumer, err := kafka.NewConsumer(&kafka.ConfigMap{
-		"bootstrap.servers":  p.BootstrapServers,
-		"group.id":           p.GroupID,
-		"auto.offset.reset":  "earliest",
-		"enable.auto.commit": true,
-		"security.protocol":  "ssl",
-		"ssl.ca.location":    p.SSL.CALocation,
+		"bootstrap.servers":        p.BootstrapServers,
+		"group.id":                 p.GroupID,
+		"auto.offset.reset":        "earliest",
+		"enable.auto.commit":       true,
+		"security.protocol":        "ssl",
+		"ssl.ca.location":          p.SSL.CALocation,
+		"ssl.certificate.location": p.SSL.CertLocation,
+		"ssl.key.location":         p.SSL.KeyLocation,
 	})
 	if err != nil {
 		return err

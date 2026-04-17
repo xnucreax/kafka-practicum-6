@@ -12,20 +12,35 @@ x-kafka-common: &kafka-common
     KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,SSL:SSL,EXTERNAL_SSL:SSL
     KAFKA_CFG_INTER_BROKER_LISTENER_NAME: SSL
     KAFKA_CFG_SSL_KEYSTORE_PASSWORD: keystore_password
+    KAFKA_CFG_SSL_KEY_PASSWORD: sslkey_password
     KAFKA_CFG_SSL_TRUSTSTORE_PASSWORD: truststore_password
-    KAFKA_CFG_SSL_CLIENT_AUTH: none
+    KAFKA_CFG_SSL_CLIENT_AUTH: requested
+    KAFKA_CFG_SSL_PRINCIPAL_MAPPING_RULES: "RULE:^CN=([^,]+).*$/$1/,DEFAULT"
     ALLOW_PLAINTEXT_LISTENER: "yes"
     KAFKA_CFG_AUTHORIZER_CLASS_NAME: org.apache.kafka.metadata.authorizer.StandardAuthorizer
     KAFKA_CFG_ALLOW_EVERYONE_IF_NO_ACL_FOUND: "false"
     KAFKA_CFG_SUPER_USERS: User:ANONYMOUS
   volumes:
-    - ./infra/stores:/bitnami/kafka/config/certs
+    - ./infra/kafka/stores:/bitnami/kafka/config/certs
   healthcheck:
     test: ["CMD-SHELL", "kafka-broker-api-versions.sh --bootstrap-server localhost:9091 2>/dev/null || exit 1"]
     interval: 10s
     timeout: 5s
     retries: 5
     start_period: 30s
+
+x-practicum-common: &practicum-common
+  build: .
+  deploy:
+  depends_on: &practicum-depends-on
+    kafka-1:
+      condition: service_healthy
+    kafka-2:
+      condition: service_healthy
+    kafka-3:
+      condition: service_healthy
+    kafka-init:
+      condition: service_completed_successfully
 
 services:
   kafka-1:
@@ -65,45 +80,37 @@ services:
       kafka-3:
         condition: service_healthy
     volumes:
-      - ./infra/kafka-init.sh:/kafka-init.sh:ro
-      - ./infra/certs/ca.crt:/etc/kafka/certs/ca.crt:ro
-      - ./infra/client.properties:/etc/kafka/client.properties:ro
+      - ./infra/kafka/kafka-init.sh:/kafka-init.sh:ro
+      - ./infra/ca/certs/ca.crt:/etc/kafka/certs/ca.crt:ro
+      - ./infra/kafka/client.properties:/etc/kafka/client.properties:ro
     entrypoint: ["/bin/bash", "/kafka-init.sh"]
 
   practicum-service-1:
-    build: .
-    deploy:
+    <<: *practicum-common
     environment:
       - KAFKA_BOOTSTRAP=kafka-1:9092,kafka-2:9092,kafka-3:9092
       - KAFKA_SSL_CA_LOCATION=/etc/kafka/certs/ca.crt
+      - KAFKA_SSL_CERT_LOCATION=/etc/kafka/certs/practicum-1.crt
+      - KAFKA_SSL_KEY_LOCATION=/etc/kafka/certs/practicum-1.key
       - KAFKA_TOPIC=topic-1
     volumes:
-      - ./infra/certs/ca.crt:/etc/kafka/certs/ca.crt:ro
+      - ./infra/ca/certs/ca.crt:/etc/kafka/certs/ca.crt:ro
+      - ./infra/services/practicum-1/certs/practicum-1.crt:/etc/kafka/certs/practicum-1.crt:ro
+      - ./infra/services/practicum-1/certs/practicum-1.key:/etc/kafka/certs/practicum-1.key:ro
     depends_on:
-      kafka-1:
-        condition: service_healthy
-      kafka-2:
-        condition: service_healthy
-      kafka-3:
-        condition: service_healthy
-      kafka-init:
-        condition: service_completed_successfully
+      <<: *practicum-depends-on
 
   practicum-service-2:
-    build: .
-    deploy:
+    <<: *practicum-common
     environment:
       - KAFKA_BOOTSTRAP=kafka-1:9092,kafka-2:9092,kafka-3:9092
       - KAFKA_SSL_CA_LOCATION=/etc/kafka/certs/ca.crt
+      - KAFKA_SSL_CERT_LOCATION=/etc/kafka/certs/practicum-2.crt
+      - KAFKA_SSL_KEY_LOCATION=/etc/kafka/certs/practicum-2.key
       - KAFKA_TOPIC=topic-2
     volumes:
-      - ./infra/certs/ca.crt:/etc/kafka/certs/ca.crt:ro
+      - ./infra/ca/certs/ca.crt:/etc/kafka/certs/ca.crt:ro
+      - ./infra/services/practicum-2/certs/practicum-2.crt:/etc/kafka/certs/practicum-2.crt:ro
+      - ./infra/services/practicum-2/certs/practicum-2.key:/etc/kafka/certs/practicum-2.key:ro
     depends_on:
-      kafka-1:
-        condition: service_healthy
-      kafka-2:
-        condition: service_healthy
-      kafka-3:
-        condition: service_healthy
-      kafka-init:
-        condition: service_completed_successfully
+      <<: *practicum-depends-on
