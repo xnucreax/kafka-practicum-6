@@ -16,6 +16,7 @@ type ProducerParams struct {
 	Topic            string
 	Id               int
 	SSL              SSLConfig
+	SendPeriod       time.Duration
 }
 
 func RunProducer(ctx context.Context, p ProducerParams) error {
@@ -33,7 +34,7 @@ func RunProducer(ctx context.Context, p ProducerParams) error {
 	go func() {
 		defer producer.Close()
 
-		tmr := time.NewTicker(10 * time.Millisecond)
+		tmr := time.NewTicker(p.SendPeriod)
 		defer tmr.Stop()
 
 		for {

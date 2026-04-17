@@ -1,9 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "Bash(openssl x509 *)",
-      "Bash(keytool -list -keystore /Users/nucrea/projects/practicum/yandex-practicum-kafka/module-6/infra/stores/kafka.keystore.pkcs12 -storepass keystore_password -storetype PKCS12)",
-      "Bash(keytool -list -keystore /Users/nucrea/projects/practicum/yandex-practicum-kafka/module-6/infra/stores/kafka.truststore.jks -storepass truststore_password)"
-    ]
-  }
-}

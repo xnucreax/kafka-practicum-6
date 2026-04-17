@@ -70,14 +70,32 @@ services:
       - ./infra/client.properties:/etc/kafka/client.properties:ro
     entrypoint: ["/bin/bash", "/kafka-init.sh"]
 
-  practicum-service:
+  practicum-service-1:
     build: .
     deploy:
-      replicas: 2
     environment:
       - KAFKA_BOOTSTRAP=kafka-1:9092,kafka-2:9092,kafka-3:9092
-      - KAFKA_TOPIC=messages
       - KAFKA_SSL_CA_LOCATION=/etc/kafka/certs/ca.crt
+      - KAFKA_TOPIC=topic-1
+    volumes:
+      - ./infra/certs/ca.crt:/etc/kafka/certs/ca.crt:ro
+    depends_on:
+      kafka-1:
+        condition: service_healthy
+      kafka-2:
+        condition: service_healthy
+      kafka-3:
+        condition: service_healthy
+      kafka-init:
+        condition: service_completed_successfully
+
+  practicum-service-2:
+    build: .
+    deploy:
+    environment:
+      - KAFKA_BOOTSTRAP=kafka-1:9092,kafka-2:9092,kafka-3:9092
+      - KAFKA_SSL_CA_LOCATION=/etc/kafka/certs/ca.crt
+      - KAFKA_TOPIC=topic-2
     volumes:
       - ./infra/certs/ca.crt:/etc/kafka/certs/ca.crt:ro
     depends_on:

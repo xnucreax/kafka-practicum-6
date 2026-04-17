@@ -5,8 +5,7 @@ import (
 	"log"
 	"math/rand"
 	"os"
-	"os/signal"
-	"syscall"
+	"time"
 
 	"kafka/internal"
 )
@@ -34,6 +33,7 @@ func main() {
 		Topic:            topic,
 		Id:               producerId,
 		SSL:              ssl,
+		SendPeriod:       2 * time.Second,
 	}); err != nil {
 		log.Fatalf("failed to start producer: %v", err)
 	}
@@ -47,18 +47,14 @@ func main() {
 		log.Fatalf("failed to start single consumer: %v", err)
 	}
 
-	if err := internal.RunBatchMessageConsumer(ctx, internal.BatchMessageConsumerParams{
-		BootstrapServers: bootstrapServers,
-		GroupID:          "batch-consumer-group",
-		Topic:            topic,
-		SSL:              ssl,
-	}); err != nil {
-		log.Fatalf("failed to start batch consumer: %v", err)
-	}
+	// if err := internal.RunBatchMessageConsumer(ctx, internal.BatchMessageConsumerParams{
+	// 	BootstrapServers: bootstrapServers,
+	// 	GroupID:          "batch-consumer-group",
+	// 	Topic:            topic,
+	// 	SSL:              ssl,
+	// }); err != nil {
+	// 	log.Fatalf("failed to start batch consumer: %v", err)
+	// }
 
-	sigchan := make(chan os.Signal, 1)
-	signal.Notify(sigchan, syscall.SIGINT, syscall.SIGTERM)
-	sig := <-sigchan
-	log.Printf("received signal %v, shutting down", sig)
-	cancel()
+	<-ctx.Done()
 }

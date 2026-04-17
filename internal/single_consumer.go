@@ -58,7 +58,7 @@ func RunSingleMessageConsumer(ctx context.Context, p SingleMessageConsumerParams
 				continue
 			}
 
-			log.Printf("message: id %s, value %d", msg.UUID.String(), msg.Value)
+			log.Printf("received message: id %s, value %d", msg.UUID.String(), msg.Value)
 		}
 	}()
 
